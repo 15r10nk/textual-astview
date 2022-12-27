@@ -27,13 +27,13 @@ class Astare( App[ None ] ):
     TITLE = "astare"
     """str: The main title of the app."""
 
-    SUB_TITLE = f"A Python AST Explorer ({__version__})"
+    SUB_TITLE = f"A Python Explorer ({__version__})"
     """str: The sub title of the app."""
 
-    def __init__( self, cli_args: argparse.Namespace, *args: Any, **kwargs: Any ) -> None:
+    def __init__( self,  *args: Any, **kwargs: Any ) -> None:
         """Initialise the app."""
         super().__init__( *args, **kwargs )
-        self._args = cli_args
+        self._args = get_args()
 
     def on_mount( self ) -> None:
         """Set up the application on startup."""

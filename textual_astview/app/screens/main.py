@@ -22,6 +22,7 @@ from textual.css.query  import NoMatches
 # Local imports.
 from textual_astview import ASTView, ASTNode, NodeInfo, Source, __version__
 
+from ...widgets.bytecodeview import BytecodeView
 ##############################################################################
 class MainDisplay( Screen ):
     """The main display of the app."""
@@ -59,6 +60,11 @@ class MainDisplay( Screen ):
     ASTView:focus-within {
         border: double $primary-lighten-2;
     }
+
+    BytecodeView{
+        width:1fr;
+        height:1fr;
+    }
     """
 
     BINDINGS = [
@@ -93,6 +99,10 @@ class MainDisplay( Screen ):
         """
         return ASTView( self._args.file )
 
+    def bytecode_pane(self) -> BytecodeView:
+
+        return BytecodeView()
+
     def source_pane( self ) -> Source:
         """Make a Source pane.
 
@@ -114,10 +124,11 @@ class MainDisplay( Screen ):
 
         if self._args.file.is_file():
             body = [
-                DirectoryTree( str( self._args.file.parent ), classes="insert" ), self.ast_pane(), self.source_pane()
+                DirectoryTree( str( self._args.file.parent ), classes="insert" ), self.ast_pane(), self.source_pane(), self.bytecode_pane()
             ]
         else:
             body = [ DirectoryTree( str( self._args.file ), classes="visible initial" ) ]
+
 
         yield Header()
         yield Vertical( Horizontal( *body ), NodeInfo() )
@@ -186,6 +197,13 @@ class MainDisplay( Screen ):
         # snappy by updating right away.
         self.highlight_node( event.node )
 
+    def on_bytecode_view_node_changed(self,event):
+        node=event.node.tree_node
+        self.highlight_node(node)
+        # TODO: ast node selection does not work
+        self.query_one(ASTView).select_node(node)
+        
+
     def watch_rainbow( self, new_value: bool ) -> None:
         """React to the rainbow flag being changed.
 
@@ -232,8 +250,12 @@ class MainDisplay( Screen ):
         else:
             await self.mount( self.ast_pane(), after="DirectoryTree" )
             await self.mount( self.source_pane(), after="ASTView" )
+            await self.mount( self.bytecode_pane(), after="Source" )
             self.query_one( DirectoryTree ).toggle_class( "initial", "insert" )
         self.query_one( Source ).show_file( self._args.file )
+        source=self.query_one( ASTView )._source
+        self.query_one(BytecodeView).source=source
+
         self.query_one( DirectoryTree ).set_class( False, "visible" )
         self._init_tree()
 

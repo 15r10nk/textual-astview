@@ -15,6 +15,8 @@ from typing    import Any, cast, ClassVar, Union, Optional
 # Rich imports.
 from rich.text import Text
 
+import executing
+
 ##############################################################################
 # Textual imports.
 from textual.widgets import Tree, TreeNode
@@ -67,7 +69,9 @@ class ASTView( Tree[ Any ] ):
         # parse in the whole blasted thing up front. I've never found the
         # AST parser to be noticeably slow.
         try:
-            self._module: Optional[ ast.Module ] = ast.parse( module.read_text() )
+            self._source=executing.Source.for_filename(module)
+            self._module: Optional[ ast.Module ]=self._source.tree
+            #self._module: Optional[ ast.Module ] = ast.parse( module.read_text() )
         except SyntaxError:
             self._module = None
 
@@ -118,7 +122,11 @@ class ASTView( Tree[ Any ] ):
             label = Text( f"{label} " ) + def_name
 
         # Now go with what we've got.
-        return to_node.add( label, data=item )
+        result= to_node.add( label, data=item )
+
+        item.tree_node=result
+
+        return result
 
     @base_node.register
     def _( self, item: str, to_node: ASTNode ) -> ASTNode:

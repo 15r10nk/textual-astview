@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 textual = {extras = ["dev"], version = "*"}
+executing = "*"
 
 [dev-packages]
 pylint = "*"

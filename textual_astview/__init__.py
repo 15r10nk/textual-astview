@@ -16,6 +16,7 @@ from .widgets.astview     import ASTView, ASTNode
 from .widgets.node_info   import NodeInfo
 from .widgets.source_info import SourceInfo
 from .widgets.source      import Source
+from .widgets.bytecodeview import BytecodeView
 
 ##############################################################################
 # Export the widgets.
@@ -24,7 +25,8 @@ __all__ = [
     "ASTNode",
     "NodeInfo",
     "SourceInfo",
-    "Source"
+    "Source",
+    "BytecodeView"
 ]
 
 ### __init__.py ends here
